@@ -7,5 +7,15 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   resources :users, only: [:create]
-  resources :sessions, only: [:create, :destroy]
+   post '/login', to: 'sessions#create'
+   delete '/logout', to: 'sessions#destroy'
+
+   resources :rooms do
+     member do
+       post :join
+       delete :leave
+     end
+     resources :messages, only: [:index, :create]
+   end
+
 end
