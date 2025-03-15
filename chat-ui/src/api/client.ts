@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = "http://localhost:3000/";
 
 const client = axios.create({
   baseURL: BASE_URL,
@@ -9,12 +9,12 @@ const client = axios.create({
   },
 });
 
-export const login = async (email: string, password: string) => {
-  const response = await client.post("/login", { email, password });
-  return response.data;
-};
+client.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
-export const logout = async () => {
-  const response = await client.delete("/logout");
-  return response.data;
-};
+export default client;
