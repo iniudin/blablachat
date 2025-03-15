@@ -7,15 +7,16 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   resources :users, only: [:create]
-   post '/login', to: 'sessions#create'
-   delete '/logout', to: 'sessions#destroy'
+    post '/login', to: 'sessions#create'
+    delete '/logout', to: 'sessions#destroy'
 
-   resources :rooms do
-     member do
-       post :join
-       delete :leave
-     end
-     resources :messages, only: [:index, :create]
-   end
+    resources :rooms do
+      member do
+        post :join
+        delete :leave
+      end
+      resources :messages, only: [:index, :create]
+    end
 
+  mount ActionCable.server => '/cable'
 end
