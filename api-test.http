@@ -6,11 +6,14 @@ Content-Type: application/json
   "name": "John Doe",
   "password": "password123"
 }
+> {%
+    client.global.set("auth_token", response.body.user.auth_token);
+%}
 
 ### Logout
-DELETE /logout
+DELETE http://localhost:3000/api/logout
 Content-Type: application/json
-Authorization: Bearer <token>
+Authorization: Bearer {{auth_token}}
 
 ### Register
 POST http://localhost:3000/api/register
@@ -20,3 +23,6 @@ Content-Type: application/json
   "name": "John Doe",
   "password": "password123"
 }
+> {%
+    client.global.set("auth_token", response.body.user.auth_token);
+%}

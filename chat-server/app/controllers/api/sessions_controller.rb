@@ -12,7 +12,7 @@ class Api::SessionsController < ApplicationController
   end
 
   def destroy
-    current_user.destroy_session
+    current_user.update(auth_token: nil)
     render json: { message: "Logged out successfully" }, status: :ok
   end
 end
