@@ -1,15 +1,7 @@
+import { AuthContext } from "@/contexts/auth-context";
 import { User } from "@/types/user";
-import { createContext, useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import authApi from "@/api/auth";
-
-const AuthContext = createContext<{
-  user: User | null;
-  login: (name: string, password: string) => Promise<void>;
-  register: (name: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
-  loading: boolean;
-  error: string | null;
-} | null>(null);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
