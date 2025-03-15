@@ -1,3 +1,4 @@
+import { User } from "@/types/user";
 import client from "./client";
 
 const login = async (name: string, password: string) => {
@@ -21,7 +22,7 @@ const register = async (name: string, password: string) => {
   return response.data;
 };
 
-const getCurrentUser = async () => {
+const getCurrentUser = (): User | null => {
   return localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user")!)
     : null;
