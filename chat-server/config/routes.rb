@@ -10,13 +10,13 @@ Rails.application.routes.draw do
     post '/login', to: 'sessions#create'
     delete '/logout', to: 'sessions#destroy'
 
-    resources :rooms do
-      member do
-        post :join
-        delete :leave
-      end
-      resources :messages, only: [:index, :create]
+  resources :rooms do
+    member do
+      post :join
+      delete :leave
     end
+    resources :messages, only: [:index, :create]
+  end
 
   mount ActionCable.server => '/cable'
 end
