@@ -27,6 +27,7 @@ class RoomsController < ApplicationController
     if @room.public || @room.users.include?(current_user)
       unless @room.users.include?(current_user)
         @room.room_users.create(user: current_user)
+        RoomChannel.broadcast_to(@room, { type: 'USER_JOINED', user: current_user.as_json(only: [:id, :email]) })
       end
       render json: @room
     else
@@ -38,6 +39,7 @@ class RoomsController < ApplicationController
     @room = Room.find(params[:id])
     @room_member = @room.room_members.find_by(user: current_user)
     if @room_member&.destroy
+      RoomChannel.broadcast_to(@room, { type: 'USER_LEFT', user: current_user.as_json(only: [:id, :email]) })
       render json: {message: 'Left room successfully'}
     else
       render json: { error: 'Not a member of the room' }, status: :forbidden
