@@ -1,4 +1,4 @@
-class MessagesController < ApplicationController
+class Api::MessagesController < ApplicationController
   before_action :set_room
   before_action :authorize_room_access
 
@@ -14,7 +14,7 @@ class MessagesController < ApplicationController
     @message.user = current_user
     if @message.save
       RoomChannel.broadcast_to(@room, {
-        type: 'NEW_MESSAGE',
+        type: "NEW_MESSAGE",
         message: @message.as_json(include: { user: { only: [:id, :email] } })
       })
       render json: @message, status: :created
@@ -31,11 +31,11 @@ class MessagesController < ApplicationController
 
   def authorize_room_access
     unless @room.public || @room.users.include?(current_user)
-      render json: { error: 'Access denied' }, status: :forbidden
+      render json: { error: "Access denied" }, status: :forbidden
     end
   end
 
   def message_params
-    params.require(:message).permit(:content)
+    params.permit(:content)
   end
 end

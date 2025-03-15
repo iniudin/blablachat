@@ -1,4 +1,4 @@
-class RoomsController < ApplicationController
+class Api::RoomsController < ApplicationController
   before_action :authenticate_user!
 
   def index
@@ -27,11 +27,11 @@ class RoomsController < ApplicationController
     if @room.public || @room.users.include?(current_user)
       unless @room.users.include?(current_user)
         @room.room_users.create(user: current_user)
-        RoomChannel.broadcast_to(@room, { type: 'USER_JOINED', user: current_user.as_json(only: [:id, :email]) })
+        RoomChannel.broadcast_to(@room, { type: "USER_JOINED", user: current_user.as_json(only: [:id, :email]) })
       end
       render json: @room
     else
-      render json: { error: 'Cannot join private room' }, status: :forbidden
+      render json: { error: "Cannot join private room" }, status: :forbidden
     end
   end
 
@@ -39,22 +39,22 @@ class RoomsController < ApplicationController
     @room = Room.find(params[:id])
     @room_member = @room.room_members.find_by(user: current_user)
     if @room_member&.destroy
-      RoomChannel.broadcast_to(@room, { type: 'USER_LEFT', user: current_user.as_json(only: [:id, :email]) })
-      render json: {message: 'Left room successfully'}
+      RoomChannel.broadcast_to(@room, { type: "USER_LEFT", user: current_user.as_json(only: [:id, :email]) })
+      render json: { message: "Left room successfully" }
     else
-      render json: { error: 'Not a member of the room' }, status: :forbidden
+      render json: { error: "Not a member of the room" }, status: :forbidden
     end
   end
 
   private
 
   def room_params
-     params.require(:room).permit(:name, :public)
-   end
+    params.permit(:name, :public)
+  end
 
-   def authorize_room_access(room)
-     unless room.public || room.users.include?(current_user)
-       render json: { error: 'Access denied' }, status: :forbidden
-     end
-   end
+  def authorize_room_access(room)
+    unless room.public || room.users.include?(current_user)
+      render json: { error: "Access denied" }, status: :forbidden
+    end
+  end
 end

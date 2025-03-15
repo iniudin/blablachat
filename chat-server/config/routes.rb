@@ -6,16 +6,18 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
 
   # Defines the root path route ("/")
-  resources :users, only: [:create]
+  namespace :api do
+    post '/register', to: 'users#create'
     post '/login', to: 'sessions#create'
     delete '/logout', to: 'sessions#destroy'
 
-  resources :rooms do
-    member do
-      post :join
-      delete :leave
+    resources :rooms do
+      member do
+        post :join
+        delete :leave
+      end
+      resources :messages, only: [:index, :create]
     end
-    resources :messages, only: [:index, :create]
   end
 
   mount ActionCable.server => '/cable'
