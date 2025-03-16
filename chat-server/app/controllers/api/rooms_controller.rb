@@ -23,15 +23,21 @@ class Api::RoomsController < ApplicationController
   end
 
   def join
-    @room = Room.find(params[:id])
+    @room = Room.find_by(id: params[:id])
+
+    if @room.nil?
+      render json: { error: "Room not found" }, status: :not_found
+      return
+    end
+
     if @room.public || @room.users.include?(current_user)
-      unless @room.users.include?(current_user)
-        @room.room_users.create(user: current_user)
-        RoomChannel.broadcast_to(@room, { type: "USER_JOINED", user: current_user.as_json(only: [:id, :email]) })
-      end
+      add_user_to_room(@room, current_user)
+      render json: @room
+    elsif params[:invite_code] && @room.invite_code == params[:invite_code]
+      add_user_to_room(@room, current_user)
       render json: @room
     else
-      render json: { error: "Cannot join private room" }, status: :forbidden
+      render json: { error: "Cannot join room" }, status: :forbidden
     end
   end
 
@@ -39,7 +45,7 @@ class Api::RoomsController < ApplicationController
     @room = Room.find(params[:id])
     @room_member = @room.room_members.find_by(user: current_user)
     if @room_member&.destroy
-      RoomChannel.broadcast_to(@room, { type: "USER_LEFT", user: current_user.as_json(only: [:id, :email]) })
+      RoomChannel.broadcast_to(@room, { type: "USER_LEFT", user: current_user.as_json(only: [:id, :name]) })
       render json: { message: "Left room successfully" }
     else
       render json: { error: "Not a member of the room" }, status: :forbidden
@@ -50,6 +56,13 @@ class Api::RoomsController < ApplicationController
 
   def room_params
     params.permit(:name, :public)
+  end
+
+  def add_user_to_room(room, user)
+    unless room.users.include?(user)
+      room.room_users.create(user: user)
+      RoomChannel.broadcast_to(room, { type: "USER_JOINED", user: user.as_json(only: [:id, :name]) })
+    end
   end
 
   def authorize_room_access(room)

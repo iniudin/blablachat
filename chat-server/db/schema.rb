@@ -34,7 +34,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_15_004856) do
 
   create_table "rooms", force: :cascade do |t|
     t.string "name", null: false
-    t.boolean "private", default: false
+    t.boolean "public", default: true
+    t.string "invite_code"
     t.integer "owner_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

@@ -5,5 +5,6 @@ class Room < ApplicationRecord
   has_many :messages, dependent: :destroy
 
   validates :name, presence: true
+  validates :invite_code, uniqueness: true
   validates :public, inclusion: { in: [true, false] }
 end
