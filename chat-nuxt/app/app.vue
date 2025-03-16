@@ -1,10 +1,15 @@
+<script setup lang="ts">
+const appConfig = useAppConfig();
+</script>
+
 <template>
-  <UApp>
-    <ToastProvider>
-      <NuxtLayout>
-        <NuxtPage/>
-      </NuxtLayout>
-      <Toaster/>
-    </ToastProvider>
+  <UApp :toaster="appConfig.toaster">
+    <NuxtLoadingIndicator
+      color="var(--ui-primary)"
+      :height="2"
+    />
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
   </UApp>
 </template>

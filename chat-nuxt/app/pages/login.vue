@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import type {FormSubmitEvent} from "@nuxt/ui";
-import {z} from "zod";
+import type { FormSubmitEvent } from '@nuxt/ui';
+import { z } from 'zod';
 
 const schema = z.object({
   name: z.string(),
@@ -18,18 +18,21 @@ const toast = useToast();
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
   toast.add({
-    title: "Success",
-    description: "The form has been submitted.",
-    color: "success",
+    title: 'Success',
+    description: 'The form has been submitted.',
+    color: 'success',
   });
   console.log(event.data);
 }
 </script>
+
 <template>
   <div class="flex justify-center items-center min-h-screen">
     <UCard>
       <template #header>
-        <h2 class="font-semibold text-xl">Login</h2>
+        <h2 class="font-semibold text-xl">
+          Login
+        </h2>
         <p class="text-gray-500">
           Please enter your name and password to login.
         </p>
@@ -38,7 +41,8 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         :schema="schema"
         :state="state"
         class="space-y-4"
-        @submit="onSubmit">
+        @submit="onSubmit"
+      >
         <UFormField
           label="Name"
           name="name"
@@ -46,19 +50,25 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
           <UInput
             v-model="state.name"
             class="w-full"
-            placeholder="Enter your name"/>
+            placeholder="Enter your name"
+          />
         </UFormField>
 
         <UFormField
           label="Password"
-          name="password">
+          name="password"
+        >
           <UInput
             v-model="state.password"
             class="w-full"
             placeholder="Enter your password"
-            type="password"/>
+            type="password"
+          />
         </UFormField>
-        <UButton class="w-full items-start" type="submit">
+        <UButton
+          class="w-full items-start"
+          type="submit"
+        >
           Login
         </UButton>
       </UForm>

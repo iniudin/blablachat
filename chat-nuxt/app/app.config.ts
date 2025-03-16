@@ -9,7 +9,10 @@ export default defineAppConfig({
       defaultVariants: {
         // Set default button color to neutral
         // color: 'neutral'
-      }
-    }
-  }
-})
+      },
+    },
+  },
+  toaster: {
+    position: 'top-right' as const,
+  },
+});

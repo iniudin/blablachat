@@ -1,8 +1,10 @@
 <template>
   <div class="flex flex-col items-center justify-center gap-4 h-screen">
-    <h1 class="font-bold text-2xl text-(--ui-primary)">BlaBla Chat</h1>
+    <h1 class="font-bold text-2xl text-(--ui-primary)">
+      BlaBla Chat
+    </h1>
     <p>
-      Demonstration Chat App with RoR and Nuxt
+      Demonstration Chat App with Ruby on Rails and Nuxt
     </p>
 
     <div class="flex items-center gap-4">
@@ -15,10 +17,8 @@
       <UButton
         icon="i-lucide-user-plus"
         label="Register"
-        to="/reister"
+        to="/register"
       />
     </div>
   </div>
 </template>
-<script lang="ts" setup>
-</script>
