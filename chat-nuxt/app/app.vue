@@ -1,0 +1,10 @@
+<template>
+  <UApp>
+    <ToastProvider>
+      <NuxtLayout>
+        <NuxtPage/>
+      </NuxtLayout>
+      <Toaster/>
+    </ToastProvider>
+  </UApp>
+</template>
