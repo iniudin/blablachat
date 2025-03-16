@@ -5,7 +5,7 @@ class Api::SessionsController < ApplicationController
     user = User.find_by(name: params[:name])
     if user && user.authenticate(params[:password])
       user.regenerate_auth_token
-      render json: { user: user.as_json(except: [:password_digest]) }, status: :ok
+      render json: { user: user.as_json(except: [:password_digest]), token: user.auth_token }, status: :ok
     else
       render json: { error: "Invalid email or password" }, status: :unauthorized
     end

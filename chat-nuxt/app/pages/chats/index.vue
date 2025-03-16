@@ -1,16 +1,22 @@
 <script lang="ts" setup>
-const authStore = useAuthStore();
+const auth = useAuthStore();
 const router = useRouter();
 
 watchEffect(() => {
-  if (!authStore.isLoggedIn) {
-    router.push("/login");
+  if (!auth.isLoggedIn) {
+    const query = useRoute().query;
+    if (query.register) {
+      router.push('/register');
+    }
+    else {
+      router.push('/login');
+    }
   }
 });
 </script>
 
 <template>
-  <UContainer>
-    <slot/>
-  </UContainer>
+  <div>
+    <p>Some default layout content shared across all pages</p>
+  </div>
 </template>

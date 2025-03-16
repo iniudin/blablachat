@@ -13,6 +13,6 @@ export default defineAppConfig({
     },
   },
   toaster: {
-    position: 'top-right' as const,
+    position: 'bottom-right' as const,
   },
 });

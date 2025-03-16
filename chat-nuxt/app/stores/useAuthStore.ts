@@ -18,37 +18,13 @@ export const useAuthStore = defineStore('auth', {
     },
   },
   actions: {
-    async login(email: string, password: string) {
-      try {
-        const response = await useFetch<{ user: User; token: string }>(
-          '/api/login', { method: 'POST', body: { email, password } },
-        );
-
-        if (!response.data.value) {
-          throw new Error('Login failed');
-        }
-
-        this.user = response.data.value.user;
-        this.token = response.data.value.token;
-      }
-      catch (error) {
-        throw new Error(
-          error instanceof Error ? error.message : 'Login failed',
-        );
-      }
+    login(user: User, token: string) {
+      this.user = user;
+      this.token = token;
     },
-    async logout() {
-      try {
-        await useFetch('/api/logout', { method: 'POST' });
-
-        this.user = null;
-        this.token = null;
-      }
-      catch (error) {
-        throw new Error(
-          error instanceof Error ? error.message : 'Logout failed',
-        );
-      }
+    logout() {
+      this.user = null;
+      this.token = null;
     },
   },
 });

@@ -14,7 +14,7 @@ const register = async (name: string, password: string) => {
   return await useApiFetch('/api/register', { method: 'POST', body: { name, password } });
 };
 
-export default {
+export {
   login,
   logout,
   register,

@@ -18,7 +18,7 @@ const leaveRoom = async (id: string) => {
   return await useApiFetch(`/api/rooms/${id}/leave`, { method: 'POST' });
 };
 
-export default {
+export {
   getRooms,
   getRoom,
   createRoom,
