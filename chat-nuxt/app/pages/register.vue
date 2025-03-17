@@ -22,9 +22,10 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     await register(event.data.name, event.data.password);
     toast.add({
       title: 'Success',
-      description: 'The form has been submitted.',
+      description: 'Registered successfully',
       color: 'success',
     });
+    navigateTo('/login');
   }
   catch (error) {
     if (error instanceof Error) {

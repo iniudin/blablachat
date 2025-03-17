@@ -1,33 +1,31 @@
 <script lang="ts" setup>
-const auth = useAuthStore();
-const router = useRouter();
+import { ULink } from '#components';
 
-watchEffect(() => {
-  if (!auth.isLoggedIn) {
-    router.push('/login');
-  }
-});
+const auth = useAuthStore();
+
+function handleLogout() {
+  auth.logout();
+  navigateTo('/login');
+}
 </script>
 
 <template>
   <UContainer class="py-4">
     <div class="flex items-center justify-between">
       <h1 class="font-bold text-2xl text-(--ui-primary) mb-4">
-        Chats
+        <ULink to="/">
+          BlaBla Chat
+        </ULink>
       </h1>
       <div
         v-if="auth.isLoggedIn"
         class="flex items-center gap-4"
       >
-        <UButton
-          icon="i-lucide-user-plus"
-          label="New Chat"
-          to="/chats/new"
-        />
+        Logged in as {{ auth.user?.name }}
         <UButton
           icon="i-lucide-user"
           label="Logout"
-          @click="auth.logout"
+          @click="handleLogout"
         />
       </div>
     </div>

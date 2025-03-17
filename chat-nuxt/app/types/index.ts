@@ -3,15 +3,18 @@ export interface User {
   name: string;
 }
 
-export interface Chat {
+export interface Room {
   id: string;
   name: string;
-  users: User[];
+  public: boolean;
+  invite_code: string;
 }
 
 export interface Message {
   id: string;
   content: string;
-  sender: User;
-  chat: Chat;
+  room: Room;
+  user: User;
+  created_at: string;
+  updated_at: string;
 }

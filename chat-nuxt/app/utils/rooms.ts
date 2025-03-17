@@ -1,21 +1,23 @@
+import type { Room } from '~/types';
+
 const getRooms = async () => {
-  return await useApiFetch('/api/rooms');
+  return await useApiFetch<Room[]>('/api/rooms');
 };
 
 const getRoom = async (id: string) => {
-  return await useApiFetch(`/api/rooms/${id}`);
+  return await useApiFetch<Room>(`/api/rooms/${id}`);
 };
 
-const createRoom = async (name: string, isPublic: boolean) => {
-  return await useApiFetch('/api/rooms', { method: 'POST', body: { name, isPublic } });
+const createRoom = async (data: Partial<Room>) => {
+  return await useApiFetch<Room>('/api/rooms', { method: 'POST', body: data });
 };
 
 const joinRoom = async (id: string) => {
-  return await useApiFetch(`/api/rooms/${id}/join`, { method: 'POST' });
+  return await useApiFetch<Room>(`/api/rooms/${id}/join`, { method: 'POST' });
 };
 
 const leaveRoom = async (id: string) => {
-  return await useApiFetch(`/api/rooms/${id}/leave`, { method: 'POST' });
+  return await useApiFetch<Room>(`/api/rooms/${id}/leave`, { method: 'POST' });
 };
 
 export {
