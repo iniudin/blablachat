@@ -25,6 +25,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_15_004856) do
   create_table "room_members", force: :cascade do |t|
     t.integer "room_id", null: false
     t.integer "user_id", null: false
+    t.string "role", default: "member"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["room_id", "user_id"], name: "index_room_members_on_room_id_and_user_id", unique: true
@@ -36,10 +37,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_15_004856) do
     t.string "name", null: false
     t.boolean "public", default: true
     t.string "invite_code"
-    t.integer "owner_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["owner_id"], name: "index_rooms_on_owner_id"
+    t.index ["invite_code"], name: "index_rooms_on_invite_code", unique: true
   end
 
   create_table "users", force: :cascade do |t|
@@ -56,5 +56,4 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_15_004856) do
   add_foreign_key "messages", "users"
   add_foreign_key "room_members", "rooms"
   add_foreign_key "room_members", "users"
-  add_foreign_key "rooms", "owners"
 end

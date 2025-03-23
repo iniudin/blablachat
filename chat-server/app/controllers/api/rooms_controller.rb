@@ -1,39 +1,73 @@
 class Api::RoomsController < ApplicationController
   before_action :authenticate_user!
+  before_action :set_room, only: [:show, :update, :destroy, :join, :leave, :members]
 
   def index
-    @rooms = Room.where(public: true).or(current_user.rooms.where(public: false))
-    render json: @rooms
+    public_rooms = Room.where(public: true)
+    private_rooms = Room.joins(:room_members).where(public: false, room_members: { user_id: current_user.id })
+    @rooms = Room.where(id: public_rooms.pluck(:id) + private_rooms.pluck(:id))
+
+    if params[:search].present?
+      @rooms = @rooms.where("rooms.name ILIKE ?", "%#{params[:search]}%")
+    end
+
+    render json: @rooms.presence || { message: "No rooms found" },
+           status: @rooms.any? ? :ok : :not_found
   end
 
   def show
-    @room = Room.find(params[:id])
-    authorize_room_access(@room)
-    render json: @room
+    return unless authorize_room_access(@room)
+
+    render json: @room.as_json(include: { room_members: { include: { user: { only: [:id, :name, :email] } } } })
   end
 
   def create
-    @room = current_user.owned_rooms.build(room_params)
+    @room = Room.new(room_params)
+    @room.generate_invite_code
+
     if @room.save
-      @room.room_members.create(user: current_user)
+      # Set current user sebagai admin room
+      @room.room_members.create(user: current_user, role: "admin")
       render json: @room, status: :created
     else
-      render json: { errors: @room.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: @room.errors.full_messages },
+             status: :unprocessable_entity
+    end
+  end
+
+  def update
+    # Hanya admin room yang dapat mengubah data room
+    membership = @room.room_members.find_by(user: current_user)
+    unless membership && membership.role == 'admin'
+      return render json: { error: "Unauthorized" }, status: :forbidden
+    end
+
+    if @room.update(room_params)
+      render json: @room
+    else
+      render json: { errors: @room.errors.full_messages },
+             status: :unprocessable_entity
+    end
+  end
+
+  def destroy
+    # Hanya admin room yang dapat menghapus room
+    membership = @room.room_members.find_by(user: current_user)
+    unless membership && membership.role == 'admin'
+      return render json: { error: "Unauthorized" }, status: :forbidden
+    end
+
+    if @room.destroy
+      render json: { message: "Room deleted successfully" }
+    else
+      render json: { errors: @room.errors.full_messages },
+             status: :unprocessable_entity
     end
   end
 
   def join
-    @room = Room.find_by(id: params[:id])
-
-    if @room.nil?
-      render json: { error: "Room not found" }, status: :not_found
-      return
-    end
-
-    if @room.public || @room.users.include?(current_user)
-      add_user_to_room(@room, current_user)
-      render json: @room
-    elsif params[:invite_code] && @room.invite_code == params[:invite_code]
+    if @room.public || @room.users.include?(current_user) || 
+       (params[:invite_code].present? && @room.invite_code == params[:invite_code])
       add_user_to_room(@room, current_user)
       render json: @room
     else
@@ -42,9 +76,8 @@ class Api::RoomsController < ApplicationController
   end
 
   def leave
-    @room = Room.find(params[:id])
     @room_member = @room.room_members.find_by(user: current_user)
-    if @room_member&.destroy
+    if @room_member && @room_member.destroy
       RoomChannel.broadcast_to(@room, { type: "USER_LEFT", user: current_user.as_json(only: [:id, :name]) })
       render json: { message: "Left room successfully" }
     else
@@ -52,15 +85,27 @@ class Api::RoomsController < ApplicationController
     end
   end
 
+  def members
+    return unless authorize_room_access(@room)
+    members = @room.room_members.includes(:user)
+    render json: members.as_json(include: { user: { only: [:id, :name, :email] } })
+  end
+
   private
 
+  def set_room
+    @room = Room.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: "Room not found" }, status: :not_found
+  end
+
   def room_params
-    params.permit(:name, :public)
+    params.require(:room).permit(:name, :public, :invite_code)
   end
 
   def add_user_to_room(room, user)
     unless room.users.include?(user)
-      room.room_users.create(user: user)
+      room.room_members.create(user: user)
       RoomChannel.broadcast_to(room, { type: "USER_JOINED", user: user.as_json(only: [:id, :name]) })
     end
   end
@@ -68,6 +113,8 @@ class Api::RoomsController < ApplicationController
   def authorize_room_access(room)
     unless room.public || room.users.include?(current_user)
       render json: { error: "Access denied" }, status: :forbidden
+      return false
     end
+    true
   end
 end

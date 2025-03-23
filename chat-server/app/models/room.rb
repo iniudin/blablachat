@@ -1,7 +1,6 @@
 class Room < ApplicationRecord
   before_create :generate_invite_code
 
-  belongs_to :owner, class_name: 'User'
   has_many :room_members, dependent: :destroy
   has_many :users, through: :room_members
   has_many :messages, dependent: :destroy

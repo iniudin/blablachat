@@ -41,6 +41,16 @@ Authorization: Bearer {{authToken}}
 
 ###
 
+### Access protected resource: Create Room
+POST {{baseUrl}}/api/rooms
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Room Global",
+  "public": true
+}
+
 ### Log out the current user
 DELETE {{baseUrl}}/api/logout
 Authorization: Bearer {{authToken}}
