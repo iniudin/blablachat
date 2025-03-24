@@ -28,6 +28,34 @@ Content-Type: application/json
 
 ###
 
+### Register a new user as another user
+POST {{baseUrl}}/api/register
+Content-Type: application/json
+
+{
+  "name": "Another User Doe",
+  "password": "password123"
+}
+
+###
+
+### Log in with the registered user
+# @name login
+POST {{baseUrl}}/api/login
+Content-Type: application/json
+
+{
+  "name": "Another User Doe",
+  "password": "password123"
+}
+
+###
+
+### Extract the authentication token from the login response
+@authToken = {{login.response.body.token}}
+
+###
+
 
 ### Log out the current user
 DELETE {{baseUrl}}/api/logout
@@ -35,11 +63,6 @@ Authorization: Bearer {{authToken}}
 
 ###
 
-### Access protected resource: Get Rooms
-GET {{baseUrl}}/api/rooms
-Authorization: Bearer {{authToken}}
-
-###
 
 ### Access protected resource: Create Room
 POST {{baseUrl}}/api/rooms
@@ -51,8 +74,39 @@ Content-Type: application/json
   "public": true
 }
 
-### Log out the current user
-DELETE {{baseUrl}}/api/logout
+### Access protected resource: Get Rooms
+GET {{baseUrl}}/api/rooms
 Authorization: Bearer {{authToken}}
 
 ###
+
+### Access protected resource: Get Room by ID
+# @name room
+GET {{baseUrl}}/api/rooms/1
+Authorization: Bearer {{authToken}}
+
+###
+
+### Extract the authentication token from the login response
+@inviteCode = {{room.response.body.invite_code}}
+
+###
+
+### Access protected resource: Join Room
+POST {{baseUrl}}/api/rooms/1/join
+Authorization: Bearer {{authToken}}
+
+###
+
+### Access protected resource: Join Room with invite code
+POST {{baseUrl}}/api/rooms/invite?invite_code={{inviteCode}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+
+### Access protected resource: Leave Room
+DELETE {{baseUrl}}/api/rooms/1/leave
+Authorization: Bearer {{authToken}}
+
+###
+

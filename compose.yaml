@@ -1,0 +1,29 @@
+services:
+  chat-nuxt:
+    build:
+      context: ./chat-nuxt/
+      dockerfile: Dockerfile
+    environment:
+      - API_BASE=http://chat-server:3001
+      - PORT=3000
+    ports:
+      - "3000:3000"
+
+  chat-server:
+    build:
+      context: ./chat-server/
+      dockerfile: Dockerfile
+    environment:
+      - RAILS_ENV=production
+      - PORT=3001
+    ports:
+      - "3001:3001"
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+volumes:
+  redis-data:

@@ -13,11 +13,11 @@ export default defineNuxtConfig({
     }
   },
   routeRules: {
-    "/chats": {ssr: false},
+    "/chats": { ssr: false },
   },
   runtimeConfig: {
     public: {
-      apiBase: process.env.API_BASE || "http://localhost:3000",
+      apiBase: process.env.API_BASE || "http://localhost:3001",
     },
   },
   css: ["~/assets/css/main.css"],

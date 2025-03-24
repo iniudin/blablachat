@@ -26,7 +26,6 @@ class Api::RoomsController < ApplicationController
     @room.generate_invite_code
 
     if @room.save
-      # Set current user sebagai admin room
       @room.room_members.create(user: current_user, role: "admin")
       render json: @room, status: :created
     else
@@ -36,7 +35,6 @@ class Api::RoomsController < ApplicationController
   end
 
   def update
-    # Hanya admin room yang dapat mengubah data room
     membership = @room.room_members.find_by(user: current_user)
     unless membership && membership.role == 'admin'
       return render json: { error: "Unauthorized" }, status: :forbidden
@@ -51,7 +49,6 @@ class Api::RoomsController < ApplicationController
   end
 
   def destroy
-    # Hanya admin room yang dapat menghapus room
     membership = @room.room_members.find_by(user: current_user)
     unless membership && membership.role == 'admin'
       return render json: { error: "Unauthorized" }, status: :forbidden
@@ -66,13 +63,13 @@ class Api::RoomsController < ApplicationController
   end
 
   def join
-    if @room.public || @room.users.include?(current_user) || 
-       (params[:invite_code].present? && @room.invite_code == params[:invite_code])
-      add_user_to_room(@room, current_user)
-      render json: @room
-    else
-      render json: { error: "Cannot join room" }, status: :forbidden
+    unless @room.public
+      return render json: { error: "This is a private room. Please use the join_by_invite endpoint with invite code." }, 
+             status: :bad_request
     end
+
+    add_user_to_room(@room, current_user)
+    render json: @room
   end
 
   def leave
@@ -89,6 +86,18 @@ class Api::RoomsController < ApplicationController
     return unless authorize_room_access(@room)
     members = @room.room_members.includes(:user)
     render json: members.as_json(include: { user: { only: [:id, :name, :email] } })
+  end
+
+  def invite
+    @room = Room.find_by(invite_code: params[:invite_code])
+    return render json: { error: "Room not found" }, status: :not_found if @room.nil?
+
+    if @room.invite_code == params[:invite_code]
+      add_user_to_room(@room, current_user)
+      render json: @room
+    else
+      render json: { error: "Invalid invite code" }, status: :forbidden
+    end
   end
 
   private
