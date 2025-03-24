@@ -1,19 +1,21 @@
 class Api::RoomsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_room, only: [:show, :update, :destroy, :join, :leave, :members]
+  before_action :set_room, only: [:show, :update, :destroy, :join, :leave]
 
   def index
-    public_rooms = Room.where(public: true)
-    private_rooms = Room.joins(:room_members).where(public: false, room_members: { user_id: current_user.id })
-    @rooms = Room.where(id: public_rooms.pluck(:id) + private_rooms.pluck(:id))
-
     if params[:search].present?
-      @rooms = @rooms.where("rooms.name ILIKE ?", "%#{params[:search]}%")
+      @rooms = Room.where("LOWER(rooms.name) LIKE ?", "%#{params[:search].downcase}%")
+    else
+      public_rooms = Room.where(public: true)
+      private_rooms = Room.joins(:room_members).where(public: false, room_members: { user_id: current_user.id })
+  
+      @rooms = Room.from("(#{public_rooms.to_sql} UNION #{private_rooms.to_sql}) AS rooms")
     end
-
+  
     render json: @rooms.presence || { message: "No rooms found" },
            status: @rooms.any? ? :ok : :not_found
   end
+  
 
   def show
     return unless authorize_room_access(@room)
@@ -55,7 +57,7 @@ class Api::RoomsController < ApplicationController
     end
 
     if @room.destroy
-      render json: { message: "Room deleted successfully" }
+      render json: { message: "Room deleted successfully" }, status: :ok
     else
       render json: { errors: @room.errors.full_messages },
              status: :unprocessable_entity
@@ -64,12 +66,12 @@ class Api::RoomsController < ApplicationController
 
   def join
     unless @room.public
-      return render json: { error: "This is a private room. Please use the join_by_invite endpoint with invite code." }, 
+      return render json: { error: "This is a private room. Please use invite code." }, 
              status: :bad_request
     end
 
     add_user_to_room(@room, current_user)
-    render json: @room
+    render json: @room, status: :ok
   end
 
   def leave
@@ -82,19 +84,13 @@ class Api::RoomsController < ApplicationController
     end
   end
 
-  def members
-    return unless authorize_room_access(@room)
-    members = @room.room_members.includes(:user)
-    render json: members.as_json(include: { user: { only: [:id, :name, :email] } })
-  end
-
   def invite
     @room = Room.find_by(invite_code: params[:invite_code])
     return render json: { error: "Room not found" }, status: :not_found if @room.nil?
 
     if @room.invite_code == params[:invite_code]
       add_user_to_room(@room, current_user)
-      render json: @room
+      render json: @room, status: :ok
     else
       render json: { error: "Invalid invite code" }, status: :forbidden
     end

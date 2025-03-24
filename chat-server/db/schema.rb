@@ -17,7 +17,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_15_004856) do
     t.integer "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["room_id", "user_id"], name: "index_messages_on_room_id_and_user_id", unique: true
     t.index ["room_id"], name: "index_messages_on_room_id"
     t.index ["user_id"], name: "index_messages_on_user_id"
   end

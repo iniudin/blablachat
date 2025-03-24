@@ -6,7 +6,7 @@ class Api::MessagesController < ApplicationController
     page = params[:page] || 1
     per_page = params[:per_page] || 20
     @messages = @room.messages.includes(:user).order(created_at: :desc).page(page).per(per_page)
-    render json: @messages.reverse
+    render json: @messages.reverse.as_json(include: { user: { only: [:id, :name] } }, except: [:user_id, :room_id]), status: :ok
   end
 
   def create
@@ -15,9 +15,9 @@ class Api::MessagesController < ApplicationController
     if @message.save
       RoomChannel.broadcast_to(@room,{
         type: "NEW_MESSAGE",
-        message: @message.as_json(include: { user: { only: [:id, :email] } })
+        message: @message.as_json(include: { user: { only: [:id, :name] } }, except: [:user_id, :room_id])
       })
-      render json: @message, status: :created
+      render json: @message.as_json(include: { user: { only: [:id, :name] } }, except: [:user_id, :room_id]), status: :created
     else
       render json: { errors: @message.errors.full_messages }, status: :unprocessable_entity
     end

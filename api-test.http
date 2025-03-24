@@ -80,6 +80,12 @@ Authorization: Bearer {{authToken}}
 
 ###
 
+### Access protected resource: Search Room
+GET {{baseUrl}}/api/rooms?search=Room%20Global
+Authorization: Bearer {{authToken}}
+
+###
+
 ### Access protected resource: Get Room by ID
 # @name room
 GET {{baseUrl}}/api/rooms/1
@@ -110,3 +116,43 @@ Authorization: Bearer {{authToken}}
 
 ###
 
+### Access protected resource: Update Room
+PUT {{baseUrl}}/api/rooms/1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Room Global Updated"
+}
+
+### Access protected resource: Delete Room
+DELETE {{baseUrl}}/api/rooms/1
+Authorization: Bearer {{authToken}}
+
+###
+
+### Access protected resource: Create Message
+POST {{baseUrl}}/api/rooms/1/messages
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "content": "Hello, Welcome to the room!"
+}
+
+###
+
+### Access protected resource: Create Message
+POST {{baseUrl}}/api/rooms/1/messages
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "content": "Hello, Welcome to the room! This is a test message."
+}
+
+### Access protected resource: Get Messages
+GET {{baseUrl}}/api/rooms/1/messages
+Authorization: Bearer {{authToken}}
+
+###

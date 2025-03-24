@@ -7,8 +7,5 @@ class Message < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
-
-    add_index :messages, [:room_id, :user_id], unique: true
-    
   end
 end
