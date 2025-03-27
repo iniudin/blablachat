@@ -105,7 +105,7 @@ Authorization: Bearer {{authToken}}
 ###
 
 ### Access protected resource: Join Room with invite code
-POST {{baseUrl}}/api/rooms/invite?invite_code={{inviteCode}}
+GET {{baseUrl}}/api/rooms/invite?invite_code={{inviteCode}}
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
