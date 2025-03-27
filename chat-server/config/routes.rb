@@ -13,7 +13,7 @@ Rails.application.routes.draw do
 
     resources :rooms do
       collection do
-        post :invite
+        get :invite
       end
       member do
         post :join

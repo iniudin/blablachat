@@ -19,7 +19,7 @@ const newRoomErrors = reactive({
 
 const { data: rooms, status, error, refresh } = await useLazyAsyncData(
   'rooms',
-  () => getRooms(),
+  async () => await getRooms(),
 );
 
 const handleJoinRoom = async (roomId: string) => {
@@ -33,7 +33,6 @@ const handleJoinRoom = async (roomId: string) => {
 };
 
 const handleCreateRoom = async () => {
-  // Reset errors
   newRoomErrors.name = '';
 
   // Validate
@@ -74,16 +73,16 @@ const handleCreateRoom = async () => {
     </div>
 
     <div
-      v-if="status"
+      v-if="status === 'pending'"
       class="text-center py-10"
     >
       Loading rooms...
     </div>
     <div
-      v-else-if="error"
+      v-else-if="status === 'error'"
       class="text-center py-10 text-red-500"
     >
-      Error loading rooms: {{ error.message }}
+      Error loading rooms: {{ error?.message }}
     </div>
     <div
       v-else
@@ -95,34 +94,29 @@ const handleCreateRoom = async () => {
           :key="room.id"
           class="hover:shadow-md transition-shadow"
         >
-          <UCardHeader>
-            <div class="flex items-center">
-              {{ room.name }}
-              <UBadge
-                v-if="room.public"
-                color="success"
-                class="ml-2"
-              >
-                Public
-              </UBadge>
-              <UBadge
-                v-else
-                color="warning"
-                class="ml-2"
-              >
-                Private
-              </UBadge>
-            </div>
-          </UCardHeader>
-          <UCardBody />
-          <UCardFooter>
-            <UButton
-              block
-              @click="handleJoinRoom(room.id)"
+          <div class="flex items-center">
+            {{ room.name }}
+            <UBadge
+              v-if="room.public"
+              color="success"
+              class="ml-2"
             >
-              Enter Room
-            </UButton>
-          </UCardFooter>
+              Public
+            </UBadge>
+            <UBadge
+              v-else
+              color="warning"
+              class="ml-2"
+            >
+              Private
+            </UBadge>
+          </div>
+          <UButton
+            block
+            @click="handleJoinRoom(room.id)"
+          >
+            Enter Room
+          </UButton>
         </UCard>
       </template>
       <div
@@ -133,61 +127,48 @@ const handleCreateRoom = async () => {
       </div>
     </div>
 
-    <!-- Create Room Modal -->
-    <UModal v-model="isCreateRoomModalOpen">
-      <UCard>
-        <UCardHeader>
-          <div class="text-xl font-bold">
-            Create New Room
-          </div>
-          <p class="text-sm text-gray-500">
-            Create a new chat room. Public rooms can be joined by anyone.
-          </p>
-        </UCardHeader>
-        <UCardBody>
-          <form
-            class="space-y-4"
-            @submit.prevent="handleCreateRoom"
+    <UModal
+      v-model:open="isCreateRoomModalOpen"
+      title="Create New Room"
+    >
+      <template #body>
+        <form
+          @submit.prevent="handleCreateRoom"
+        >
+          <label
+            for="roomName"
+            class="block text-sm font-medium"
           >
-            <div class="space-y-2">
-              <label
-                for="roomName"
-                class="block text-sm font-medium"
-              >
-                Room Name
-              </label>
-              <UInput
-                id="roomName"
-                v-model="newRoom.name"
-                placeholder="Enter room name"
-                required
-                :error="newRoomErrors.name"
-              />
-            </div>
-            <UFormGroup>
-              <UCheckbox
-                v-model="newRoom.public"
-                label="Public Room (anyone can join)"
-              />
-            </UFormGroup>
-          </form>
-        </UCardBody>
-        <UCardFooter class="flex justify-end">
-          <UButton
-            color="neutral"
-            class="mr-2"
-            @click="isCreateRoomModalOpen = false"
-          >
-            Cancel
-          </UButton>
-          <UButton
-            :loading="creatingRoom"
-            @click="handleCreateRoom"
-          >
-            Create Room
-          </UButton>
-        </UCardFooter>
-      </UCard>
+            Room Name
+          </label>
+          <UInput
+            id="roomName"
+            v-model="newRoom.name"
+            placeholder="Enter room name"
+            required
+            :error="newRoomErrors.name"
+          />
+          <UCheckbox
+            v-model="newRoom.public"
+            label="Public Room (anyone can join)"
+          />
+        </form>
+      </template>
+      <template #footer>
+        <UButton
+          color="neutral"
+          class="mr-2"
+          @click="isCreateRoomModalOpen = false"
+        >
+          Cancel
+        </UButton>
+        <UButton
+          :loading="creatingRoom"
+          @click="handleCreateRoom"
+        >
+          Create Room
+        </UButton>
+      </template>
     </UModal>
   </div>
 </template>
