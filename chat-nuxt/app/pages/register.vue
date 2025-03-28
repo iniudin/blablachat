@@ -1,7 +1,6 @@
 <script lang="ts" setup>
-import type { FormSubmitEvent } from '@nuxt/ui';
-import { z } from 'zod';
-import { register } from '~/utils/auth';
+import type { FormSubmitEvent } from "@nuxt/ui";
+import { z } from "zod";
 
 const schema = z.object({
   name: z.string(),
@@ -17,22 +16,22 @@ const state = reactive<Partial<Schema>>({
 
 const toast = useToast();
 
+const auth = useAuthStore();
 async function onSubmit(event: FormSubmitEvent<Schema>) {
   try {
-    await register(event.data.name, event.data.password);
+    await auth.register(event.data.name, event.data.password);
     toast.add({
-      title: 'Success',
-      description: 'Registered successfully',
-      color: 'success',
+      title: "Success",
+      description: "Registered successfully",
+      color: "success",
     });
-    navigateTo('/login');
-  }
-  catch (error) {
+    navigateTo("/login");
+  } catch (error) {
     if (error instanceof Error) {
       toast.add({
-        title: 'Error',
+        title: "Error",
         description: `${error.message}`,
-        color: 'error',
+        color: "error",
       });
     }
   }
