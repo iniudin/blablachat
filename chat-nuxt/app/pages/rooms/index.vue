@@ -1,24 +1,25 @@
 <script lang="ts" setup>
-import type { Room } from '~/types';
-import { getRooms, joinRoom, createRoom } from '~/utils/rooms';
+import type { Room } from "~/types";
+import { getRooms, joinRoom, createRoom } from "~/utils/rooms";
 
 definePageMeta({
-  middleware: 'auth',
+  requiresAuth: true,
+  middleware: "auth",
 });
 
 const router = useRouter();
 const isCreateRoomModalOpen = ref(false);
 const creatingRoom = ref(false);
 const newRoom = reactive<Partial<Room>>({
-  name: '',
+  name: "",
   public: true,
 });
 const newRoomErrors = reactive({
-  name: '',
+  name: "",
 });
 
 const { data: rooms, status, error, refresh } = await useLazyAsyncData(
-  'rooms',
+  "rooms",
   async () => await getRooms(),
 );
 
@@ -26,18 +27,17 @@ const handleJoinRoom = async (roomId: string) => {
   try {
     await joinRoom(roomId);
     router.push(`/rooms/${roomId}`);
-  }
-  catch (error) {
-    console.error('Failed to join room:', error);
+  } catch (error) {
+    console.error("Failed to join room:", error);
   }
 };
 
 const handleCreateRoom = async () => {
-  newRoomErrors.name = '';
+  newRoomErrors.name = "";
 
   // Validate
   if (!newRoom.name) {
-    newRoomErrors.name = 'Room name is required';
+    newRoomErrors.name = "Room name is required";
     return;
   }
 
@@ -46,16 +46,14 @@ const handleCreateRoom = async () => {
     const room = await createRoom(newRoom);
 
     isCreateRoomModalOpen.value = false;
-    newRoom.name = '';
+    newRoom.name = "";
     newRoom.public = true;
 
     refresh();
     router.push(`/rooms/${room.id}`);
-  }
-  catch (error) {
-    console.error('Failed to create room:', error);
-  }
-  finally {
+  } catch (error) {
+    console.error("Failed to create room:", error);
+  } finally {
     creatingRoom.value = false;
   }
 };
@@ -94,7 +92,7 @@ const handleCreateRoom = async () => {
           :key="room.id"
           class="hover:shadow-md transition-shadow"
         >
-          <div class="flex items-center">
+          <div class="flex items-center justify-between">
             {{ room.name }}
             <UBadge
               v-if="room.public"
@@ -111,12 +109,14 @@ const handleCreateRoom = async () => {
               Private
             </UBadge>
           </div>
-          <UButton
-            block
-            @click="handleJoinRoom(room.id)"
-          >
-            Enter Room
-          </UButton>
+          <div class="mt-4">
+            <UButton
+              block
+              @click="handleJoinRoom(room.id)"
+            >
+              Enter Room
+            </UButton>
+          </div>
         </UCard>
       </template>
       <div

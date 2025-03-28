@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import { ULink } from '#components';
+import { ULink } from "#components";
 
 const auth = useAuthStore();
 
 function handleLogout() {
   auth.logout();
-  navigateTo('/login');
+  navigateTo("/login");
 }
 </script>
 
@@ -13,7 +13,7 @@ function handleLogout() {
   <UContainer class="py-4">
     <div class="flex items-center justify-between">
       <h1 class="font-bold text-2xl text-(--ui-primary) mb-4">
-        <ULink to="/">
+        <ULink :to="auth.isLoggedIn ? '/rooms' : '/'">
           BlaBla Chat
         </ULink>
       </h1>
@@ -29,6 +29,6 @@ function handleLogout() {
         />
       </div>
     </div>
-    <slot />
+    <slot></slot>
   </UContainer>
 </template>

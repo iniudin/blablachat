@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import type { FormSubmitEvent } from '@nuxt/ui';
-import { z } from 'zod';
-import { login } from '~/utils/auth';
+import type { FormSubmitEvent } from "@nuxt/ui";
+import { z } from "zod";
+import { login } from "~/utils/auth";
 
 definePageMeta({
   requiresAuth: false,
@@ -28,18 +28,18 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     auth.login(user, token);
 
     toast.add({
-      title: 'Success',
-      description: 'Logged in successfully as ' + user.name,
-      color: 'success',
+      title: "Success",
+      description: "Logged in successfully as " + user.name,
+      color: "success",
     });
-    navigateTo('/chats');
-  }
-  catch (error) {
+
+    navigateTo("/rooms");
+  } catch (error) {
     if (error instanceof Error) {
       toast.add({
-        title: 'Error',
+        title: "Error",
         description: `${error.message}`,
-        color: 'error',
+        color: "error",
       });
     }
   }

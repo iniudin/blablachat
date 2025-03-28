@@ -1,8 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: [
-    "@nuxt/ui", "@nuxt/eslint", "@pinia/nuxt",
-  ],
+  modules: ["@nuxt/ui", "@nuxt/eslint", "@pinia/nuxt", "@vueuse/nuxt"],
+  ssr: false,
   devtools: {
     enabled: true,
   },
@@ -10,6 +9,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiBase: process.env.API_BASE || "http://localhost:3000",
+      websocketHost: process.env.WEBSOCKET_HOST || "ws://localhost:3000/cable",
     },
   },
   future: {

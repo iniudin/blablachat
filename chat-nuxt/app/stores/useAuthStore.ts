@@ -1,14 +1,11 @@
-import { defineStore } from "pinia";
 import type { User } from "~/types";
 
 export const useAuthStore = defineStore("auth", () => {
-  const user = ref<User | null>(
-    JSON.parse(localStorage.getItem("user") || "null"),
-  );
+  const user = useState<User | null>("user", () => null);
+  const token = useState<string | null>("token", () => null);
 
-  const token = ref<string | null>(
-    localStorage.getItem("token"),
-  );
+  user.value = JSON.parse(localStorage.getItem("user") || "null");
+  token.value = localStorage.getItem("token");
 
   const isLoggedIn = computed(() => !!user.value && !!token.value);
 
