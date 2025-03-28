@@ -6,7 +6,7 @@ class Api::UsersController < ApplicationController
     if user.save
       render json: { user: user.as_json(except: [:password_digest, :auth_token]), token: user.auth_token }, status: :created
     else
-      render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
+      render json: { error: @message.errors.full_messages.join(", ") }, status: :unprocessable_entity
     end
   end
 

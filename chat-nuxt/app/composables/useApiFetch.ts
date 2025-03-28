@@ -15,7 +15,7 @@ export const useApiFetch = async <T>(url: string, opts: any = {}) => {
         console.error("Fetch:", error);
       },
       onResponseError: ({ response }) => {
-        throw new Error(`Response: ${response._data.errors.join(", ")}`);
+        throw new Error(`Response: ${response._data.error}`);
       },
     });
 

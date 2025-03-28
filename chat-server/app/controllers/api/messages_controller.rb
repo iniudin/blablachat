@@ -19,7 +19,7 @@ class Api::MessagesController < ApplicationController
       })
       render json: @message.as_json(include: { user: { only: [:id, :name] } }, except: [:user_id, :room_id]), status: :created
     else
-      render json: { errors: @message.errors.full_messages }, status: :unprocessable_entity
+      render json: { error: @message.errors.full_messages.join(", ") }, status: :unprocessable_entity
     end
   end
 

@@ -31,7 +31,7 @@ class Api::RoomsController < ApplicationController
       @room.room_members.create(user: current_user, role: "admin")
       render json: @room, status: :created
     else
-      render json: { errors: @room.errors.full_messages },
+      render json: { error: @message.errors.full_messages.join(", ") },
              status: :unprocessable_entity
     end
   end
@@ -45,7 +45,7 @@ class Api::RoomsController < ApplicationController
     if @room.update(room_params)
       render json: @room
     else
-      render json: { errors: @room.errors.full_messages },
+      render json: { error: @message.errors.full_messages.join(", ") },
              status: :unprocessable_entity
     end
   end
@@ -59,7 +59,7 @@ class Api::RoomsController < ApplicationController
     if @room.destroy
       render json: { message: "Room deleted successfully" }, status: :ok
     else
-      render json: { errors: @room.errors.full_messages },
+      render json: { error: @message.errors.full_messages.join(", ") },
              status: :unprocessable_entity
     end
   end
