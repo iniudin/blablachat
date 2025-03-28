@@ -2,8 +2,8 @@ services:
   chat-nuxt:
     image: syaifudin16/chat-nuxt:latest
     environment:
-      - NUXT_API_BASE=http://chat-server:3000
-      - NUXT_WEBSOCKET_HOST=ws://chat-server:3000/cable
+      - NUXT_PUBLIC_API_BASE=https://chat-server.udin.web.id
+      - NUXT_PUBLIC_WEBSOCKET_HOST=ws://chat-server.udin.web.id/cable
       - PORT=3001
     ports:
       - "3001:3001"
