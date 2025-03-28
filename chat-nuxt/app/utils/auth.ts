@@ -1,10 +1,9 @@
 import type { User } from "~/types";
 
 const login = async (name: string, password: string) => {
-  return await $fetch<{ user: User; token: string }>("/api/login", {
+  return await useApiFetch<{ user: User; token: string }>("/api/login", {
     method: "POST",
     body: { name, password },
-
   });
 };
 
