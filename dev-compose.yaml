@@ -1,0 +1,23 @@
+services:
+  chat-nuxt:
+    build:
+      context: ./chat-nuxt/
+      dockerfile: Dockerfile
+    environment:
+      - API_BASE=http://chat-server:3001
+      - WEBSOCKET_HOST=ws://chat-server:3001/cable
+      - PORT=3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - chat-server
+
+  chat-server:
+    build:
+      context: ./chat-server/
+      dockerfile: Dockerfile
+    environment:
+      - RAILS_ENV=production
+      - PORT=3001
+    ports:
+      - "3001:3001"

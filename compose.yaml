@@ -1,8 +1,6 @@
 services:
   chat-nuxt:
-    build:
-      context: ./chat-nuxt/
-      dockerfile: Dockerfile
+    image: syaifudin16/chat-nuxt:latest
     environment:
       - API_BASE=http://chat-server:3001
       - WEBSOCKET_HOST=ws://chat-server:3001/cable
@@ -13,11 +11,37 @@ services:
       - chat-server
 
   chat-server:
-    build:
-      context: ./chat-server/
-      dockerfile: Dockerfile
+    image: syaifudin16/chat-server:latest
     environment:
       - RAILS_ENV=production
       - PORT=3001
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE}
     ports:
       - "3001:3001"
+
+  watchtower:
+    image: containrrr/watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_POLL_INTERVAL=300
+
+  caddy:
+    image: caddy:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - chat-nuxt
+      - chat-server
+
+volumes:
+  caddy_data:
+  caddy_config:
