@@ -2,11 +2,11 @@ services:
   chat-nuxt:
     image: syaifudin16/chat-nuxt:latest
     environment:
-      - API_BASE=http://chat-server:3001
-      - WEBSOCKET_HOST=ws://chat-server:3001/cable
-      - PORT=3000
+      - NUXT_API_BASE=http://chat-server:3000
+      - NUXT_WEBSOCKET_HOST=ws://chat-server:3000/cable
+      - PORT=3001
     ports:
-      - "3000:3000"
+      - "3001:3001"
     depends_on:
       - chat-server
 
@@ -14,10 +14,10 @@ services:
     image: syaifudin16/chat-server:latest
     environment:
       - RAILS_ENV=production
-      - PORT=3001
+      - PORT=3000
       - SECRET_KEY_BASE=${SECRET_KEY_BASE}
     ports:
-      - "3001:3001"
+      - "3000:3000"
 
   watchtower:
     image: containrrr/watchtower
