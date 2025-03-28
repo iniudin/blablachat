@@ -8,8 +8,8 @@ export default defineNuxtConfig({
   css: ["~/assets/css/main.css"],
   runtimeConfig: {
     public: {
-      apiBase: process.env.API_BASE || "http://localhost:3000",
-      websocketHost: process.env.WEBSOCKET_HOST || "ws://localhost:3000/cable",
+      apiBase: "http://localhost:3000",
+      websocketHost: "ws://localhost:3000/cable",
     },
   },
   future: {
