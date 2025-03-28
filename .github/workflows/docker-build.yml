@@ -30,6 +30,8 @@ jobs:
           file: ./chat-server/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/chat-server:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/chat-server:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/chat-server:buildcache,mode=max
 
       - name: Build and Push chat-nuxt Image
         uses: docker/build-push-action@v5
@@ -38,3 +40,5 @@ jobs:
           file: ./chat-nuxt/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/chat-nuxt:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/chat-nuxt:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/chat-nuxt:buildcache,mode=max
