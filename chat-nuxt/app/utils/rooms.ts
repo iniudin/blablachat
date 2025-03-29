@@ -15,13 +15,22 @@ const createRoom = async (data: Partial<Room>) => {
   });
 };
 
-const joinRoom = async (id: string, inviteCode?: string) => {
+const deleteRoom = async (id: string) => {
+  return await useApiFetch<Room>(`/api/rooms/${id}`, {
+    method: "DELETE",
+  });
+};
+
+const joinRoom = async (id?: string, inviteCode?: string) => {
   if (inviteCode) {
     return await useApiFetch<Room>(`/api/rooms/invite?invite_code=${inviteCode}`);
+  } else if (id) {
+    return await useApiFetch<Room>(`/api/rooms/${id}/join`, {
+      method: "POST",
+    });
+  } else {
+    throw new Error("Room ID or Invite Code is required");
   }
-  return await useApiFetch<Room>(`/api/rooms/${id}/join`, {
-    method: "POST",
-  });
 };
 
 const leaveRoom = async (id: string) => {
@@ -34,6 +43,7 @@ export {
   getRooms,
   getRoom,
   createRoom,
+  deleteRoom,
   joinRoom,
   leaveRoom,
 };

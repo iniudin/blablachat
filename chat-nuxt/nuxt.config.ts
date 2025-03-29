@@ -8,8 +8,9 @@ export default defineNuxtConfig({
   css: ["~/assets/css/main.css"],
   runtimeConfig: {
     public: {
-      apiBase: "chat-server",
-      websocketHost: "chat-server/cable",
+      baseURL: "https://chat.udin.web.id",
+      apiBase: "https://chat-server.udin.web.id",
+      websocketHost: "https://chat-server.udin.web.id/cable",
     },
   },
   future: {

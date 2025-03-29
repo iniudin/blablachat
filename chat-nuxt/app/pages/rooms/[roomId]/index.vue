@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import { formatDistanceToNow } from "date-fns";
+import { deleteRoom } from "~/utils/rooms";
 import { useRoom } from "~/composables/useRoom";
+
+definePageMeta({
+  requiresAuth: true,
+  middleware: "auth",
+});
+
+const config = useRuntimeConfig();
 
 const route = useRoute();
 const roomId = ref(route.params.roomId);
@@ -13,6 +21,7 @@ const {
   loading,
   error,
   typingUsers,
+  room,
   hasMore,
   sendTypingStatus,
   sendMessage,
@@ -38,6 +47,7 @@ const handleScroll = async () => {
     try {
       isLoadingMore.value = true;
       const currentScrollHeight = messagesContainerRef.value.scrollHeight;
+      await new Promise(resolve => setTimeout(resolve, 500));
       await loadMoreMessages();
 
       nextTick(() => {
@@ -75,18 +85,133 @@ const handleSendMessage = async () => {
   await sendMessage(newMessage.value);
   newMessage.value = "";
 };
+const router = useRouter();
+const handleDeleteRoom = async () => {
+  try {
+    await deleteRoom(roomId.value as string);
+    router.push("/rooms");
+    useToast().add({
+      title: "Success",
+      description: "Room deleted successfully",
+      color: "success",
+    });
+  } catch (error) {
+    useToast().add({
+      title: "Error",
+      description: `Error deleting room: ${error}`,
+      color: "error",
+    });
+  }
+};
 
 const formatTimestamp = (timestamp: string) => {
   return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
 };
+
+const { copy, copied } = useClipboard({ source: `Join ${room.value?.name} room with link ${config.public.baseURL}/join?inviteCode=${room.value?.invite_code}` });
 </script>
 
 <template>
-  <UContainer class="h-screen flex flex-col">
-    <header class="p-4 text-center font-semibold">
-      Room: {{ roomId }}
+  <div class="max-h-[calc(100vh-7rem)] h-[calc(100vh-7rem)] flex flex-col">
+    <header class="p-4 font-semibold flex items-center justify-between">
+      <div>
+        {{ room?.name || 'Unknown Room' }}
+        <UBadge
+          v-if="room?.public"
+          color="success"
+          class="ml-2"
+        >
+          Public
+        </UBadge>
+        <UBadge
+          v-else
+          color="error"
+          class="ml-2"
+        >
+          Private
+        </UBadge>
+      </div>
+      <USlideover
+        :title="`Room Detail: ${room?.name}`"
+        :close="{
+          color: 'primary',
+          variant: 'outline',
+          class: 'rounded-full',
+        }"
+      >
+        <UButton
+          icon="i-lucide-more-horizontal"
+          color="neutral"
+          variant="subtle"
+        />
+
+        <template #body>
+          <UTabs
+            :items="[
+              { label: 'Room Details', slot: 'details' as const },
+              { label: 'Members', slot: 'members' as const },
+            ]"
+            variant="link"
+            class="gap-4 w-full"
+            :ui="{ trigger: 'flex-1' }"
+          >
+            <template #details>
+              <div class="grid grid-cols-2 gap-y-2">
+                <div class="font-semibold">
+                  Room ID:
+                </div>
+                <div>{{ room?.id }}</div>
+                <div class="font-semibold">
+                  Room Name:
+                </div>
+                <div>{{ room?.name }}</div>
+                <div class="font-semibold">
+                  Room Type:
+                </div>
+                <div>{{ room?.public ? 'Public' : 'Private' }}</div>
+                <div class="font-semibold">
+                  Invite Code:
+                </div>
+                <div class="break-all">
+                  {{ room?.invite_code }}
+                </div>
+              </div>
+              <div class="flex justify-between gap-2 mt-4">
+                <UButton
+                  :label="copied ? 'Copied' : 'Copy Invite Code'"
+                  icon="i-lucide-copy"
+                  color="primary"
+                  variant="subtle"
+                  @click="copy(`Join ${room?.name} room with link ${config.public.baseURL}/join?inviteCode=${room?.invite_code}`)"
+                />
+                <UButton
+                  label="Delete Room"
+                  icon="i-lucide-trash"
+                  color="error"
+                  variant="subtle"
+                  @click="handleDeleteRoom()"
+                />
+              </div>
+            </template>
+            <template #members>
+              <UTable
+                :headers="[
+                  { title: 'Name', key: 'name' },
+                  { title: 'Role', key: 'role' },
+                  { title: 'Joined At', key: 'joined_at' },
+                ]"
+                :data="room?.room_members.map(member => ({
+                  name: member.user.name,
+                  role: member.role,
+                  joined_at: formatTimestamp(member.created_at),
+                })) || []"
+                class="w-full"
+              />
+            </template>
+          </UTabs>
+        </template>
+      </USlideover>
     </header>
-    <!-- Messages Container -->
     <div
       ref="messagesContainerRef"
       class="flex-1 overflow-y-auto p-4 space-y-4"
@@ -127,7 +252,7 @@ const formatTimestamp = (timestamp: string) => {
             size="md"
           />
           <div
-            class="max-w-[70%] rounded-xl p-3 relative border border-gray-200"
+            class="max-w-[70%] rounded-xl p-3 relative border border-(--ui-border)"
             :class="msg.user.id === currentUser?.id
               ? 'rounded-tr-none'
               : 'rounded-tl-none'"
@@ -138,10 +263,7 @@ const formatTimestamp = (timestamp: string) => {
             <p class="text-sm">
               {{ msg.content }}
             </p>
-            <p
-              class="text-xs mt-1 opacity-70"
-              :class="msg.user.id === currentUser?.id ? 'text-primary-100' : 'text-gray-500'"
-            >
+            <p class="text-xs mt-1 opacity-70">
               {{ formatTimestamp(msg.created_at) }}
             </p>
           </div>
@@ -170,5 +292,5 @@ const formatTimestamp = (timestamp: string) => {
         Send
       </UButton>
     </div>
-  </UContainer>
+  </div>
 </template>

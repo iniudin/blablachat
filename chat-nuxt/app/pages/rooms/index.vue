@@ -23,9 +23,9 @@ const { data: rooms, status, error, refresh } = await useLazyAsyncData(
   async () => await getRooms(),
 );
 
-const handleJoinRoom = async (roomId: string) => {
+const handleJoinRoom = async (roomId?: string, inviteCode?: string) => {
   try {
-    await joinRoom(roomId);
+    await joinRoom(roomId, inviteCode);
     router.push(`/rooms/${roomId}`);
   } catch (error) {
     console.error("Failed to join room:", error);
@@ -35,7 +35,6 @@ const handleJoinRoom = async (roomId: string) => {
 const handleCreateRoom = async () => {
   newRoomErrors.name = "";
 
-  // Validate
   if (!newRoom.name) {
     newRoomErrors.name = "Room name is required";
     return;
@@ -112,7 +111,7 @@ const handleCreateRoom = async () => {
           <div class="mt-4">
             <UButton
               block
-              @click="handleJoinRoom(room.id)"
+              @click="handleJoinRoom(room.id, room.invite_code)"
             >
               Enter Room
             </UButton>
@@ -133,6 +132,7 @@ const handleCreateRoom = async () => {
     >
       <template #body>
         <form
+          class="space-y-2"
           @submit.prevent="handleCreateRoom"
         >
           <label
@@ -156,7 +156,7 @@ const handleCreateRoom = async () => {
       </template>
       <template #footer>
         <UButton
-          color="neutral"
+          variant="subtle"
           class="mr-2"
           @click="isCreateRoomModalOpen = false"
         >

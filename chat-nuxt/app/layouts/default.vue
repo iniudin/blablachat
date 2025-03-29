@@ -11,7 +11,7 @@ function handleLogout() {
 
 <template>
   <UContainer class="py-4">
-    <div class="flex items-center justify-between">
+    <div class="sticky top-0 flex items-center justify-between">
       <h1 class="font-bold text-2xl text-(--ui-primary) mb-4">
         <ULink :to="auth.isLoggedIn ? '/rooms' : '/'">
           BlaBla Chat

@@ -1,7 +1,7 @@
 import { useCable } from "./useCable";
 import { getMessages, sendMessage } from "~/utils/messages";
 import { useAuthStore } from "~/stores/useAuthStore";
-import type { Message, User } from "~/types";
+import type { Message, Room, User } from "~/types";
 
 export function useRoom(roomId: string) {
   const messages = ref<Message[]>([]);
@@ -10,9 +10,25 @@ export function useRoom(roomId: string) {
   const typingUsers = reactive<Record<string, User>>({});
   const hasMore = ref(true);
   const page = ref(1);
+  const room = ref<Room | null>(null);
   const typingTimeouts: Record<string, NodeJS.Timeout> = {};
   let subscription: ActionCable.Subscription | null = null;
   const { user: currentUser } = useAuthStore();
+
+  const loadRoom = async () => {
+    try {
+      loading.value = true;
+      room.value = await getRoom(roomId);
+    } catch (err) {
+      if (err instanceof Error) {
+        error.value = err.message;
+      } else {
+        error.value = "Failed to load room";
+      }
+    } finally {
+      loading.value = false;
+    }
+  };
 
   const loadMessages = async (reset = false) => {
     try {
@@ -127,6 +143,7 @@ export function useRoom(roomId: string) {
   };
 
   onMounted(() => {
+    loadRoom();
     setupSubscription();
   });
 
@@ -140,6 +157,7 @@ export function useRoom(roomId: string) {
   });
 
   return {
+    room,
     messages,
     loading,
     error,
